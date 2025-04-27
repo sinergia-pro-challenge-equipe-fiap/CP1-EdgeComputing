@@ -1,6 +1,7 @@
 # 🖥️ Sistema de Monitoramento Vinheria Agnello
 
 Grupo: **Sinergia Pro**  
+Desenvolvedores: **Ronaldo Aparecido Monteiro Almeida, Lucas Rowlands Abat, Vitor Bordalo Correa Guimaraes, Lucas Flekner Branquinho**
 Disciplina: **Edge Computing & Computer Systems**  
 Checkpoint 1  
 
@@ -23,7 +24,7 @@ Com a implementação de sensores, LEDs e buzzer, o sistema é capaz de monitora
   - 🟢 **Verde**: Luminosidade adequada.
   - 🟡 **Amarelo**: Alerta – Buzzer soa por 3 segundos.
   - 🔴 **Vermelho**: Luminosidade fora dos padrões aceitáveis.
-- **Exibição no display LCD** de mensagens de boas-vindas e status do sistema.
+- **Exibição no display LCD** de mensagens de boas-vindas,status do sistema e cronômetro.
 
 ---
 
