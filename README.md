@@ -1,4 +1,4 @@
-# 🖥️ Sistema de Monitoramento Ambiental da Vinheria Agnello
+# 🖥️ Sistema de Monitoramento Vinheria Agnello
 
 Grupo: **Sinergia Pro**  
 Disciplina: **Edge Computing & Computer Systems**  
