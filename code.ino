@@ -1,0 +1,375 @@
+#include <LiquidCrystal.h> //Importando a biblioteca LiquidCrystal
+
+LiquidCrystal lcd(13,12, 11, 9,7, 5,  3); //Declarando os pinos utilizados pelo LCD
+
+int ledGreen = 6; //Declarando o pino do Led verde
+int ledYellow = 4; //Declarando o pino do Led Amarelo
+int ledRed = 2; // Declarando o pino do Led Vermelho
+int sensorLed = A0; // Declarando o pino analógico utilizado pelo sensor de luminosidade
+int Buzzer = 8; // Declarando o pino do buzzer
+int d = 0; // Declarando a variável dias
+int h = 0; // Declarando a variável horas
+int m = 0; // Declarando a variável Minutos
+int s = 0; // Declarando a variável segundos
+int percentage; // Declarando a variável de porcentagem(utilizada na função map)
+int analogValue; // Declarando a variável do valor analógico(utilizada para realizar a conversão)
+
+//Função setup(inicialização, só é realizada uma vez)
+void setup() {
+  lcd.begin(16,2); //Inicializando o display lcd           
+  lcd.clear(); //Limpando o display LCD(a função lcd.clear será utilizada para limpar o display novamente)
+  animacao(); //Chamando a função animação(animação inicial)
+  lcd.setCursor(0,0); // Colocando o cursor no quadrado 0 da primeira linha(A função setcursor será utilizada com a finalidade de selecionar o quadrado inicial durante o resto do projeto)           
+  lcd.print("Sinergia Pro");  //Escrevendo sinergia pro(A função lcd.print será novamente utilizada com a mesma finalidade de escrever coisas durante o resto do projeto)
+  lcd.setCursor(0,1);           
+  lcd.print("Seja bem-vindo!!!!!!!!!!");
+  delay(5000); //Parando por 5 segundos(A função delay será utilizada com a finalidade de dar intervalos na reprodução do código por variados motivos)
+  lcd.clear();
+  delay(4000);
+  lcd.clear();
+  Serial.begin(9600); //Configurando a taxa de transferência de bits por segundo
+  //Configurando as saídas dos leds de do buzzer para receberem informações do arduíno
+  pinMode(ledGreen,OUTPUT); 
+  pinMode(ledYellow,OUTPUT);
+  pinMode(ledRed,OUTPUT);
+  pinMode(Buzzer,OUTPUT);
+}
+
+//Função loop(é repetida até que o sistema seja parado manualmente)
+void loop() {
+  if (s >= 60){ // Configurando a condição que converte segundos em minutos
+    s = s - 60;
+    m = m + 1;
+  };
+  if (m >= 60){ // Configurando a condição que converte minutos em horas
+    m = m - 60;
+    h = h + 1;
+  };
+  if (h >= 24){ // Configurando a condição que converte horas em dias
+    h = h - 24;
+    d = d + 1;
+  };
+  //Mostrando o tempo decorrido no display LCD
+  lcd.setCursor(0,1);
+  lcd.print("TIME:");
+  lcd.print(d);
+  lcd.print(":");
+  lcd.print(h);
+  lcd.print(":");
+  lcd.print(m);
+  lcd.print(":");
+  lcd.print(s);
+  analogValue = analogRead(sensorLed); //Lendo os valores do sensor de luminosidade
+  percentage = map(analogValue,0,1000,0,100); //Convertendo os valores recebidos em porcentagem
+  Serial.println("A porcentagem é: ");
+  Serial.print(percentage); // Mostrando a porcentagem no sistema do arduíno
+  Serial.println("%");
+  //Sistema de condições principal
+  if (percentage < 40){
+    //Criando a condição para caso tudo esteja ok(led verde ligado e mensagem imprimida)
+    digitalWrite(ledGreen,HIGH);
+    Serial.println("Tudo OK!!!");
+    lcd.setCursor(0,0);
+    lcd.print("Tudo OK!!!");
+    delay(3000);
+    digitalWrite(ledGreen,LOW);
+  } else if(percentage < 60){
+    //Criando a condição para caso o sistema esteja em estado de alerta(led amarelo ligado, buzzer tocando e mensagem de alerta)
+    digitalWrite(ledYellow,HIGH);
+    digitalWrite(Buzzer,HIGH);
+    Serial.println("Cuidado, a luminosidade está em nível de alerta!!!!!!!");
+    lcd.setCursor(0,0);
+    lcd.print("ALERTA!!!!");
+    delay(3000);
+    digitalWrite(ledYellow,LOW);
+    digitalWrite(Buzzer,LOW);
+  } else{
+    //Criando a condição para caso o sistema esteja com luminosidade acima do permitido(Led vermelho ligado, mensagem alertando o risco de problemas)
+    digitalWrite(ledRed,HIGH);
+    Serial.println("Luminosidade alta demais, risco de problemas!!!!!!");
+    lcd.setCursor(0,0);
+    lcd.print("RISCO ALTO!!!!");
+    delay(3000);
+    digitalWrite(ledRed,LOW);
+  };
+  delay(1000);
+  s = s + 4; // Adicionando os 4 segundos passados durante a execução da função loop à variável segundos
+  //Printando no sistema do arduino a quantidade de tempo passsado
+  Serial.println("Há quanto tempo o sistema foi ligado: ");
+  Serial.print("Dias: ");
+  Serial.println(d);
+  Serial.print("Horas: ");
+  Serial.println(h);
+  Serial.print("Minutos: ");
+  Serial.println(m);
+  Serial.print("Segundos: ");
+  Serial.println(s);
+}
+
+//Função com a animação de inicialização
+void animacao() {
+
+  //Criando as imagens que serão utilizadas para as letras
+  byte image01[8] = {B01110, B10001, B10001, B10001, B10001, B10001, B10001, B01110}; //Imagem do O
+  byte image02[8] = {B11110, B10001, B10001, B11110, B11000, B10100, B10010, B10001}; //Imagem do R
+  byte image03[8] = {B11110, B10001, B10001, B11110, B10000, B10000, B10000, B10000}; //Imagem do P
+  byte image04[8] = {B00100, B01010, B10001, B10001, B11111, B10001, B10001, B10001}; //Imagem do A
+  byte image05[8] = {B00100, B00100, B00100, B00100, B00100, B00100, B00100, B00100}; //Imagem do I
+  byte image06[8] = {B01110, B10001, B10000, B10000, B10111, B10001, B10001, B01110}; //Imagem do G
+  byte image07[8] = {B11111, B10000, B10000, B11111, B10000, B10000, B10000, B11111}; //Imagem do E
+  byte image08[8] = {B10001, B10001, B11001, B11101, B10111, B10011, B10001, B10001}; //Imagem do N
+  byte image09[8] = {B11111, B10000, B10000, B10000, B11111, B00001, B00001, B11111}; //Imagem do S
+
+  lcd.clear();
+
+  //Utilizando a função createchar para criar o caractere imagem 1
+  lcd.createChar(0,image01);
+
+  //Escrevendo o caractere no byte 0
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+
+  delay(1000);
+
+  lcd.clear();
+
+  //Repetindo o processo diversas vezes para criar a animação(Nota: o sistema arduíno é limitado a imprimir apenas 8 caracteres por vez, o que impactou na execução da animação)
+  lcd.createChar(0,image02);
+  lcd.createChar(1,image01);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+
+  delay(1000);
+
+  lcd.createChar(0,image03);
+  lcd.createChar(1,image02);
+  lcd.createChar(2,image01);
+  
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+  lcd.setCursor(2,0);
+  lcd.write(byte(2));
+
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.setCursor(1,0);
+  lcd.write(byte(0));
+  lcd.setCursor(2,0);
+  lcd.write(byte(1));
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image04);
+  lcd.createChar(1,image03);
+  lcd.createChar(2,image02);
+  lcd.createChar(3,image01);
+  
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(2,0);
+  lcd.write(byte(1));
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image05);
+  lcd.createChar(1,image04);
+  lcd.createChar(2,image03);
+  lcd.createChar(3,image02);
+  lcd.createChar(4,image01);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));  
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+  lcd.setCursor(5,0);
+  lcd.write(byte(4));
+
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image06);
+  lcd.createChar(1,image05);
+  lcd.createChar(2,image04);
+  lcd.createChar(3,image03);
+  lcd.createChar(4,image02);
+  lcd.createChar(5,image01);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));  
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+  lcd.setCursor(2,0);
+  lcd.write(byte(2));
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+  lcd.setCursor(5,0);
+  lcd.write(byte(4));
+  lcd.setCursor(6,0);
+  lcd.write(byte(5));
+  
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image06);
+  lcd.createChar(1,image05);
+  lcd.createChar(2,image04);
+  lcd.createChar(3,image03);
+  lcd.createChar(4,image02);
+  lcd.createChar(5,image01);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(4));
+  lcd.setCursor(1,0);
+  lcd.write(byte(0));  
+  lcd.setCursor(2,0);
+  lcd.write(byte(1));
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+  lcd.setCursor(5,0);
+  lcd.write(byte(3));
+  lcd.setCursor(6,0);
+  lcd.write(byte(4));
+  lcd.setCursor(7,0);
+  lcd.write(byte(5));
+  
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image07);
+  lcd.createChar(1,image06);
+  lcd.createChar(2,image05);
+  lcd.createChar(3,image04);
+  lcd.createChar(4,image03);
+  lcd.createChar(5,image02);
+  lcd.createChar(6,image01);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(1,0);
+  lcd.write(byte(5));
+  lcd.setCursor(2,0);
+  lcd.write(byte(1));  
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+  lcd.setCursor(6,0);
+  lcd.write(byte(4));
+  lcd.setCursor(7,0);
+  lcd.write(byte(5));
+  lcd.setCursor(8,0);
+  lcd.write(byte(6)); 
+  
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image08);
+  lcd.createChar(1,image07);
+  lcd.createChar(2,image06);
+  lcd.createChar(3,image05);
+  lcd.createChar(4,image04);
+  lcd.createChar(5,image03);
+  lcd.createChar(6,image02);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+  lcd.setCursor(2,0);
+  lcd.write(byte(6));  
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+  lcd.setCursor(5,0);
+  lcd.write(byte(4));
+  lcd.setCursor(7,0);
+  lcd.write(byte(5));
+  lcd.setCursor(8,0);
+  lcd.write(byte(6)); 
+  
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(1,image08);
+  lcd.createChar(2,image07);
+  lcd.createChar(3,image06);
+  lcd.createChar(4,image05);
+  lcd.createChar(5,image04);
+  lcd.createChar(6,image03);
+  lcd.createChar(7,image02);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(4));
+  lcd.setCursor(1,0);
+  lcd.write(byte(1));
+  lcd.setCursor(2,0);
+  lcd.write(byte(2));
+  lcd.setCursor(3,0);
+  lcd.write(byte(7));  
+  lcd.setCursor(4,0);
+  lcd.write(byte(3));
+  lcd.setCursor(5,0);
+  lcd.write(byte(4));
+  lcd.setCursor(6,0);
+  lcd.write(byte(5));
+  lcd.setCursor(8,0);
+  lcd.write(byte(6)); 
+  
+  delay(1000);
+
+  lcd.clear();
+
+  lcd.createChar(0,image09);
+  lcd.createChar(1,image08);
+  lcd.createChar(2,image07);
+  lcd.createChar(3,image06);
+  lcd.createChar(4,image05);
+  lcd.createChar(5,image04);
+  lcd.createChar(7,image02);
+
+  lcd.setCursor(0,0);
+  lcd.write(byte(0));
+  lcd.setCursor(1,0);
+  lcd.write(byte(4));
+  lcd.setCursor(2,0);
+  lcd.write(byte(1));
+  lcd.setCursor(3,0);
+  lcd.write(byte(2));  
+  lcd.setCursor(4,0);
+  lcd.write(byte(7));
+  lcd.setCursor(5,0);
+  lcd.write(byte(3));
+  lcd.setCursor(6,0);
+  lcd.write(byte(4));
+  lcd.setCursor(7,0);
+  lcd.write(byte(5)); 
+  
+  delay(1000);
+}
