@@ -13,6 +13,8 @@ int m = 0; // Declarando a variável Minutos
 int s = 0; // Declarando a variável segundos
 int percentage; // Declarando a variável de porcentagem(utilizada na função map)
 int analogValue; // Declarando a variável do valor analógico(utilizada para realizar a conversão)
+int valores[5] = {0,0,0,0,0}; // Declarando o array que será utilizado para fazer a média
+float media; // Declarando a variável média
 
 //Função setup(inicialização, só é realizada uma vez)
 void setup() {
@@ -60,12 +62,22 @@ void loop() {
   lcd.print(":");
   lcd.print(s);
   analogValue = analogRead(sensorLed); //Lendo os valores do sensor de luminosidade
-  percentage = map(analogValue,0,1000,0,100); //Convertendo os valores recebidos em porcentagem
+  percentage = map(analogValue,1023,0,0,100); //Convertendo os valores recebidos em porcentagem
   Serial.println("A porcentagem é: ");
   Serial.print(percentage); // Mostrando a porcentagem no sistema do arduíno
   Serial.println("%");
+  //Sistema de média
+  valores[4] = valores[3];
+  valores[3] = valores[2];
+  valores[2] = valores[1];
+  valores[1] = valores[0];
+  valores[0] = percentage;
+  media = ((valores[0] + valores[1] + valores[2] + valores[3] + valores[4])/5);
+  Serial.print("A média é: ");
+  Serial.println(media);
+  
   //Sistema de condições principal
-  if (percentage < 40){
+  if (media < 40){
     //Criando a condição para caso tudo esteja ok(led verde ligado e mensagem imprimida)
     digitalWrite(ledGreen,HIGH);
     Serial.println("Tudo OK!!!");
@@ -73,7 +85,7 @@ void loop() {
     lcd.print("Tudo OK!!!");
     delay(3000);
     digitalWrite(ledGreen,LOW);
-  } else if(percentage < 60){
+  } else if(media < 60){
     //Criando a condição para caso o sistema esteja em estado de alerta(led amarelo ligado, buzzer tocando e mensagem de alerta)
     digitalWrite(ledYellow,HIGH);
     digitalWrite(Buzzer,HIGH);
